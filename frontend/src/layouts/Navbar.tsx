@@ -5,26 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Sun, Moon, Plus } from "lucide-react";
 import { useTheme } from "@/context/ThemeProvider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="w-full flex h-16 items-center justify-between px-4">
-        {/* BAGIAN KIRI: LOGO */}
         <Link to="/" className="font-bold text-xl tracking-tight">
           TrackerLogo.
         </Link>
 
-        {/* BAGIAN KANAN: ADD BUTTON, THEME & AVATAR */}
         <div className="flex items-center gap-3 md:gap-4">
-          {/* Tombol Add Task / Tracker */}
           <Button size="sm" className="gap-2">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add Task</span>
           </Button>
 
-          {/* Tombol Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -36,14 +39,22 @@ const Navbar = () => {
             <span className="sr-only">Toggle theme</span>
           </Button>
 
-          {/* User Avatar */}
-          <Avatar className="h-9 w-9 border cursor-pointer hover:opacity-80 transition-opacity">
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt="User Avatar"
-            />
-            <AvatarFallback>US</AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar className="h-9 w-9 border cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="User Avatar"
+                />
+                <AvatarFallback>US</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuItem>test</DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
