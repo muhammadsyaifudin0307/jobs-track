@@ -5,6 +5,17 @@ import type { JobData } from "@/types/JobDataType";
 
 import { Button } from "@/components/ui/button";
 import { Briefcase, Plus } from "lucide-react";
+import { PaginationListJobs } from "@/components/PaginationListJobs";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const data: JobData[] = [
   {
@@ -46,10 +57,40 @@ const data: JobData[] = [
 ];
 
 const ListJobs = () => {
-  // const [data, setData] = useState<JobData>([]);
-  const handleOpened = () => {
-    alert(v7());
+  const [selected, setSelected] = useState<JobData | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleDetail = (job: JobData) => {
+    setSelected(job);
+    setIsOpen(true);
   };
+
+  const detailItems = [
+    {
+      label: "Company",
+      value: selected?.companyName,
+    },
+    {
+      label: "Job Desk",
+      value: selected?.jobDesk,
+    },
+    {
+      label: "Job Types",
+      value: selected?.jobTypes,
+    },
+    {
+      label: "Location",
+      value: selected?.location,
+    },
+    {
+      label: "Apply Date",
+      value: selected?.applyDate,
+    },
+    {
+      label: "Status",
+      value: selected?.status,
+    },
+  ];
   const handleEdit = () => {
     alert(v7());
   };
@@ -67,7 +108,7 @@ const ListJobs = () => {
           <span className="hidden sm:inline">Add Task</span>
         </Button>
       </div>
-      <p className="text-gray-400">Data yang ditemukan 4</p>
+      <p className="text-gray-400">Data yang ditemukan {data.length}</p>
       {!data || data.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
           <div className="rounded-full bg-muted p-6">
@@ -85,18 +126,48 @@ const ListJobs = () => {
           </div>
         </div>
       ) : (
-        <div className="grid md:grid-cols-4 grid-cols-1 gap-4 pt-6">
+        <div className="grid grid-cols-1 gap-4  md:grid-cols-4">
           {data.map((p) => (
             <JobsListCard
               key={p._id}
               {...p}
-              onOpen={handleOpened}
+              onOpen={() => handleDetail(p)}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
           ))}
+
+          <div className="col-span-1 flex items-center justify-end md:col-span-4 pt-4">
+            <PaginationListJobs />
+          </div>
         </div>
       )}
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Detail Lamaran</DialogTitle>
+            <DialogDescription>
+              Informasi lengkap mengenai status lamaran
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-6 py-4 text-sm ">
+            {detailItems.map((item, index) => (
+              <div key={index} className="flex flex-col gap-1">
+                <span className="font-medium text-muted-foreground">
+                  {item.label}
+                </span>
+                <span className="font-semibold">{item.value || "-"}</span>
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button variant="default">Cancel</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

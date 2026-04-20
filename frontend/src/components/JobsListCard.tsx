@@ -46,7 +46,7 @@ const JobsListCard = (props: JobListProps) => {
     Ghosted: "outline",
   };
   return (
-    <div className="relative group" style={{ paddingTop: "22px" }}>
+    <div className="relative group pt-6">
       <div className="absolute right-2 -top-0 z-10 flex gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         <Button size="icon" variant="secondary" onClick={() => props.onEdit()}>
           <Pencil className="h-4 w-4" />
@@ -60,30 +60,37 @@ const JobsListCard = (props: JobListProps) => {
         </Button>
       </div>
 
-      <Card className="transition-all hover:shadow-md">
-        <CardHeader>
-          <CardAction>
+      <Card className="flex h-full w-full flex-col transition-all hover:shadow-md">
+        <CardHeader className="gap-1 sm:gap-2">
+          <CardAction className="mb-1">
             <Badge variant={STATUS_VARIANTS[props.status] || "default"}>
               {props.status}
             </Badge>
           </CardAction>
-          <CardTitle className="font-extrabold">{props.companyName}</CardTitle>
-          <CardDescription className="text-muted">
+
+          <CardTitle className="line-clamp-2 text-lg font-extrabold sm:text-xl">
+            {props.companyName}
+          </CardTitle>
+
+          <CardDescription className="line-clamp-1 text-sm text-muted-foreground">
             {props.jobDesk}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 flex-1">
+
+        <CardContent className="flex-1 space-y-2.5 text-sm sm:text-base">
           {items.map((data, index) => {
             const Icon = data.icon;
             return (
-              <p key={index} className="flex items-center gap-2">
-                <Icon size={16} />
-                <span>{data.value}</span>
+              <p key={index} className="flex items-start gap-2.5">
+                <Icon className="mt-0.5 shrink-0" size={16} />
+
+                <span className="break-words">{data.value}</span>
               </p>
             );
           })}
         </CardContent>
-        <CardFooter className="flex items-center justify-around gap-2">
+
+        <CardFooter className="pt-4">
           <Button onClick={() => props.onOpen()} className="w-full">
             Lihat Detail
           </Button>
