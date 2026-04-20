@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
-import { Sun, Moon, Plus } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/context/ThemeProvider";
 import {
   DropdownMenu,
@@ -19,15 +19,10 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="w-full flex h-16 items-center justify-between px-4">
         <Link to="/" className="font-bold text-xl tracking-tight">
-          TrackerLogo.
+          JOBTracker
         </Link>
 
         <div className="flex items-center gap-3 md:gap-4">
-          <Button size="sm" className="gap-2">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add Task</span>
-          </Button>
-
           <Button
             variant="ghost"
             size="icon"
