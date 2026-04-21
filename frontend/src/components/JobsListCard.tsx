@@ -47,7 +47,7 @@ const JobsListCard = (props: JobListProps) => {
   };
   return (
     <div className="relative group pt-6">
-      <div className="absolute right-2 -top-0 z-10 flex gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+      <div className="absolute right-4 top-1 z-10 flex gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
         <Button size="icon" variant="secondary" onClick={() => props.onEdit()}>
           <Pencil className="h-4 w-4" />
         </Button>

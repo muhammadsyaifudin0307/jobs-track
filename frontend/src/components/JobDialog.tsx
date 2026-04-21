@@ -1,5 +1,4 @@
 import type { JobData } from "@/types/JobDataType";
-import React from "react";
 import {
   Dialog,
   DialogClose,
@@ -10,30 +9,25 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import type React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Input } from "./ui/input";
+import type { JobDialogProps } from "@/types/DialogType";
 
-type DialogType = "create" | "edit" | "delete" | "view";
-
-interface JobDialogProps {
-  open: boolean;
-  onChange: (open: boolean) => void;
-  selected: JobData | null;
-  type: DialogType;
-  jobId: number | string;
-  onSubmit?: (data: any) => void;
-  onDelete?: (id: number | string) => void;
-}
 function JobDialog({
-  open,
-  onChange,
+  isOpen,
   selected,
   type,
-  jobId,
   onDelete,
+  onClose,
   onSubmit,
 }: JobDialogProps) {
-  const isReadOnly = type === "view";
-  const isDelete = type === "delete";
-
   const DIALOG_CONTENT = {
     create: {
       title: "Create New Job",
@@ -54,7 +48,13 @@ function JobDialog({
     },
   };
 
-  const formFields = [
+  const formFields: Array<{
+    name: keyof JobData;
+    label: string;
+    type: "text" | "date" | "select";
+    placeholder?: string;
+    options?: string[];
+  }> = [
     {
       name: "companyName",
       label: "Company",
@@ -94,7 +94,7 @@ function JobDialog({
       name: "status",
       label: "Status",
       type: "select",
-      option: [
+      options: [
         "Saved",
         "Applied",
         "Screening",
@@ -112,30 +112,109 @@ function JobDialog({
     ? DIALOG_CONTENT[type]
     : { title: "", description: "" };
 
+  const isFormMode = type === "create" || type === "edit";
+
+  const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData) as Omit<JobData, "_id">;
+
+    onSubmit?.(data);
+  };
+
+  if (!type) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-6 py-4 text-sm ">
-          {formFields.map((field, index) => (
-            <div key={index} className="flex flex-col gap-1">
-              <span className="font-medium text-muted-foreground">
-                {field.label}
-              </span>
-              <span className="font-semibold">
-                {(selected?.[field.name] as string) || "-"}
-              </span>
+
+        {type === "delete" && (
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={() => selected?._id && onDelete?.(selected._id)}>
+              Delete
+            </Button>
+          </div>
+        )}
+
+        {isFormMode && (
+          <form
+            onSubmit={handleSubmitForm}
+            className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 md:gap-6"
+          >
+            {formFields.map((field) => (
+              <div key={field.name} className="flex flex-col">
+                <label
+                  htmlFor={field.name}
+                  className="text-sm font-medium text-muted-foreground"
+                >
+                  {field.label}
+                </label>
+                {field.type === "select" ? (
+                  <Select
+                    name={field.name}
+                    defaultValue={selected?.[field.name] as string}
+                  >
+                    <SelectTrigger id={field.name}>
+                      <SelectValue placeholder={`Choose ${field.label}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {field.options?.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    defaultValue={selected?.[field.name] as string}
+                    required
+                  />
+                )}
+              </div>
+            ))}
+            <DialogFooter className="col-span-full mt-4 sm:justify-end">
+              <DialogClose asChild>
+                <Button variant="default">Cancel</Button>
+              </DialogClose>
+              <Button type="submit">
+                {type === "create" ? "Save Data" : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+
+        {type === "view" && (
+          <div className="grid grid-cols-1 gap-4 py-4 text-sm md:grid-cols-2 md:gap-6">
+            {formFields.map((field) => (
+              <div
+                key={field.name}
+                className="flex flex-col gap-1 border-b pb-2 md:border-none md:pb-0"
+              >
+                <span className="font-medium text-muted-foreground">
+                  {field.label}
+                </span>
+                <span className="font-semibold text-foreground">
+                  {(selected?.[field.name] as string) || "-"}
+                </span>
+              </div>
+            ))}
+            <div className="col-span-full mt-4 flex justify-end">
+              <Button onClick={onClose}>Close</Button>
             </div>
-          ))}
-        </div>
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button variant="default">Cancel</Button>
-          </DialogClose>
-        </DialogFooter>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
