@@ -19,6 +19,7 @@ import {
 } from "./ui/select";
 import { Input } from "./ui/input";
 import type { JobDialogProps } from "@/types/DialogType";
+import { useToast } from "@/hooks/useToast";
 
 function JobDialog({
   isOpen,
@@ -113,15 +114,23 @@ function JobDialog({
     : { title: "", description: "" };
 
   const isFormMode = type === "create" || type === "edit";
+  const toast = useToast();
 
   const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData) as Omit<JobData, "_id">;
 
-    onSubmit?.(data);
-  };
+    if (!onSubmit) return;
 
+    toast.promise(Promise.resolve(onSubmit(data)), {
+      success:
+        type === "create"
+          ? "Lowongan berhasil ditambahkan"
+          : "Lowongan berhasil diupdate",
+      error: "Terjadi kesalahan, coba lagi",
+    });
+  };
   if (!type) return null;
 
   return (
