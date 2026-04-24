@@ -9,10 +9,19 @@ import {
   SelectValue,
 } from "./ui/select";
 
-const SearchJob = () => {
+type SearchProps = {
+  value: string;
+  onChange: (val: string) => void;
+};
+
+const SearchJob = ({ value, onChange }: SearchProps) => {
   return (
     <div className="flex justify-center items-center gap-2">
-      <Input placeholder="Search Jobs" />
+      <Input
+        placeholder="Search Jobs"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
       <Select>
         <SelectTrigger className="w-full max-w-48">
           <SelectValue placeholder="Select a fruit" />

@@ -1,14 +1,12 @@
 import JobsListCard from "@/components/JobsListCard";
-
 import SearchJob from "@/components/SearchJob";
 import type { JobData } from "@/types/JobDataType";
-
 import { Button } from "@/components/ui/button";
 import { Briefcase, Plus } from "lucide-react";
 import { PaginationListJobs } from "@/components/PaginationListJobs";
 import { useState } from "react";
-
 import JobDialog from "@/components/JobDialog";
+import { useDebounce } from "use-debounce";
 
 const data: JobData[] = [
   {
@@ -48,6 +46,7 @@ const data: JobData[] = [
     jobTypes: "Full-time",
   },
 ];
+
 interface DialogConfig {
   isOpen: boolean;
   type: "view" | "create" | "edit" | "delete" | null;
@@ -60,10 +59,24 @@ const ListJobs = () => {
     type: null,
     data: null,
   });
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 400);
+  const [page, setPage] = useState(1);
+  const limit = 20;
+
+  const filteredData = data.filter(
+    (job) =>
+      job.companyName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      job.jobDesk.toLowerCase().includes(debouncedSearch.toLowerCase()),
+  );
+
+  const totalPages = Math.ceil(filteredData.length / limit);
+  const currentData = filteredData.slice((page - 1) * limit, page * limit);
 
   const handleDetail = (job: JobData) => {
     setDialogConfig({ isOpen: true, type: "view", data: job });
   };
+
   const handleCreate = () => {
     setDialogConfig({ isOpen: true, type: "create", data: null });
   };
@@ -71,15 +84,27 @@ const ListJobs = () => {
   const handleEdit = (job: JobData) => {
     setDialogConfig({ isOpen: true, type: "edit", data: job });
   };
+
   const handleDelete = (job: JobData) => {
     setDialogConfig({ isOpen: true, type: "delete", data: job });
   };
+
+  const closeDialog = () => {
+    setDialogConfig({ isOpen: false, type: null, data: null });
+  };
+
   return (
     <div className="flex flex-col gap-5 p-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1">
-          <SearchJob />
+          <SearchJob
+            value={search}
+            onChange={(val) => {
+              setSearch(val);
+              setPage(1);
+            }}
+          />
         </div>
         <Button className="gap-2" onClick={handleCreate}>
           <Plus className="h-4 w-4" />
@@ -89,11 +114,13 @@ const ListJobs = () => {
 
       {/* Count */}
       <p className="text-sm text-muted-foreground">
-        {data.length} lowongan ditemukan
+        {debouncedSearch
+          ? `${filteredData.length} hasil untuk "${debouncedSearch}"`
+          : `${data.length} lowongan ditemukan`}
       </p>
 
-      {/* Empty State */}
-      {!data || data.length === 0 ? (
+      {/* Empty State - data kosong */}
+      {data.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
           <div className="rounded-full bg-muted p-5">
             <Briefcase className="h-8 w-8 text-muted-foreground" />
@@ -104,61 +131,76 @@ const ListJobs = () => {
               Tambahkan lowongan pekerjaan pertama kamu.
             </p>
           </div>
-          <Button size="sm" onClick={() => console.log("tes")}>
+          <Button size="sm" onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Lowongan
           </Button>
         </div>
       ) : (
         <>
-          {/* Grid */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {data.map((p) => (
-              <JobsListCard
-                key={p._id}
-                {...p}
-                onOpen={() => handleDetail(p)}
-                onEdit={() => handleEdit(p)}
-                onDelete={() => handleDelete(p)}
-              />
-            ))}
-          </div>
+          {/* Empty State - hasil search kosong */}
+          {filteredData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+              <div className="rounded-full bg-muted p-5">
+                <Briefcase className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold">
+                  Tidak ditemukan hasil
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Coba kata kunci lain untuk "{debouncedSearch}"
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {currentData.map((p) => (
+                <JobsListCard
+                  key={p._id}
+                  {...p}
+                  onOpen={() => handleDetail(p)}
+                  onEdit={() => handleEdit(p)}
+                  onDelete={() => handleDelete(p)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
-          <div className="flex justify-end border-t pt-4">
-            <PaginationListJobs />
-          </div>
+          {totalPages > 1 && (
+            <div className="flex justify-end border-t pt-4">
+              <PaginationListJobs
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
         </>
       )}
 
+      {/* Dialog */}
       {dialogConfig.type && (
         <JobDialog
           isOpen={dialogConfig.isOpen}
           type={dialogConfig.type}
           selected={dialogConfig.data}
-          onClose={() =>
-            setDialogConfig({ isOpen: false, type: null, data: null })
-          }
+          onClose={closeDialog}
           onSubmit={(formData) => {
-            console.log("Submit Action:", dialogConfig.type);
-            console.log("Data dari Form:", formData);
-
-            // Logika simpel untuk membedakan POST (Create) dan PUT (Edit)
             if (dialogConfig.type === "create") {
-              // Fetch POST
+              // TODO: Fetch POST
+              console.log("Create:", formData);
             } else if (dialogConfig.type === "edit") {
-              // Fetch PUT menggunakan dialogConfig.data._id
+              // TODO: Fetch PUT dengan id: dialogConfig.data?._id
+              console.log("Edit:", dialogConfig.data?._id, formData);
             }
-
-            // Tutup dialog setelah berhasil
-            setDialogConfig({ isOpen: false, type: null, data: null });
+            closeDialog();
           }}
           onDelete={(id) => {
-            console.log("Menghapus ID:", id);
-            // Jalankan fetch DELETE ke backend
-
-            // Tutup dialog setelah berhasil
-            setDialogConfig({ isOpen: false, type: null, data: null });
+            // TODO: Fetch DELETE
+            console.log("Delete:", id);
+            closeDialog();
           }}
         />
       )}

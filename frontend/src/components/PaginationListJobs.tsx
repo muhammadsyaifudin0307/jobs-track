@@ -1,36 +1,45 @@
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+type Props = {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+};
 
-export function PaginationListJobs() {
+export function PaginationListJobs({ page, totalPages, onPageChange }: Props) {
   return (
     <Pagination>
       <PaginationContent>
+        {/* Previous */}
         <PaginationItem>
-          <PaginationPrevious href="#" />
+          <PaginationPrevious
+            onClick={() => page > 1 && onPageChange(page - 1)}
+          />
         </PaginationItem>
+
+        {/* Number */}
+        {Array.from({ length: totalPages }).map((_, i) => (
+          <PaginationItem key={i}>
+            <PaginationLink
+              isActive={page === i + 1}
+              onClick={() => onPageChange(i + 1)}
+            >
+              {i + 1}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
+        {/* Next */}
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#" isActive>
-            2
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationEllipsis />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext
+            onClick={() => page < totalPages && onPageChange(page + 1)}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
