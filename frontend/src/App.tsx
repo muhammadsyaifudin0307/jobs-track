@@ -1,7 +1,12 @@
 import { Route, Routes } from "react-router";
 import MainLayout from "./layouts/MainLayout";
-import ListJobs from "./pages/ListJobs";
-import DetailListJobs from "./pages/DetailListJobs";
+
+// App.tsx
+import { lazyWithDelay } from "@/lib/lazyWithDelay";
+
+// Ganti lazy biasa dengan lazyWithDelay
+const ListJobs = lazyWithDelay(() => import("@/pages/ListJobs"));
+const DetailListJobs = lazyWithDelay(() => import("@/pages/DetailListJobs"));
 
 export const App = () => {
   return (
