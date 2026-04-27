@@ -35,16 +35,15 @@ function JobCardSkeleton() {
     </div>
   );
 }
-
 export function GlobalSkeleton() {
   return (
     <div className="flex flex-col gap-5 p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-1 gap-2">
           <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-9 w-48 shrink-0" />
+          <Skeleton className="h-9 w-48 shrink-0 hidden sm:block" />
         </div>
-        <Skeleton className="h-9 w-24 shrink-0" />
+        <Skeleton className="h-9 w-9 sm:w-24 shrink-0" />
       </div>
 
       <Skeleton className="h-4 w-40" />
