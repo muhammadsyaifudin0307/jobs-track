@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 import { Sun, Moon } from "lucide-react";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/contexts/ThemeProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,

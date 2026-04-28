@@ -1,0 +1,5 @@
+// src/contexts/AuthContext.ts  ← pakai ini, huruf A kapital, tanpa x
+import { createContext } from "react";
+import type { AuthContextType } from "@/types/auth";
+
+export const AuthContext = createContext<AuthContextType | null>(null);
