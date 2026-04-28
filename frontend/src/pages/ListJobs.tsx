@@ -60,15 +60,21 @@ const ListJobs = () => {
     data: null,
   });
   const [search, setSearch] = useState("");
+  const [jobTypeFilter, setJobTypeFilter] = useState("All");
   const [debouncedSearch] = useDebounce(search, 400);
   const [page, setPage] = useState(1);
   const limit = 20;
 
-  const filteredData = data.filter(
-    (job) =>
+  const filteredData = data.filter((job) => {
+    const matchSearch =
       job.companyName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      job.jobDesk.toLowerCase().includes(debouncedSearch.toLowerCase()),
-  );
+      job.jobDesk.toLowerCase().includes(debouncedSearch.toLowerCase());
+
+    const matchFilter =
+      jobTypeFilter === "All" || job.jobTypes === jobTypeFilter;
+
+    return matchSearch && matchFilter;
+  });
 
   const totalPages = Math.ceil(filteredData.length / limit);
   const currentData = filteredData.slice((page - 1) * limit, page * limit);
@@ -104,6 +110,8 @@ const ListJobs = () => {
               setSearch(val);
               setPage(1);
             }}
+            filterValue={jobTypeFilter}
+            onFilterChange={setJobTypeFilter}
           />
         </div>
         <Button className="gap-2" onClick={handleCreate}>

@@ -1,4 +1,3 @@
-// src/components/GlobalSkeleton.tsx
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
@@ -12,9 +11,10 @@ function JobCardSkeleton() {
     <div className="relative pt-6">
       <Card className="flex h-full w-full flex-col">
         <CardHeader className="gap-1 sm:gap-2">
-          <Skeleton className="h-5 w-16 rounded-full mb-1" />
-
-          <Skeleton className="h-6 w-3/4" />
+          <div className="flex justify-between">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-5 w-20 rounded-full mb-1" />
+          </div>
 
           <Skeleton className="h-4 w-1/2" />
         </CardHeader>
@@ -40,8 +40,8 @@ export function GlobalSkeleton() {
     <div className="flex flex-col gap-5 p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-1 gap-2">
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-9 w-48 shrink-0 hidden sm:block" />
+          <Skeleton className="h-9 w-1/2 sm:w-full" />
+          <Skeleton className="h-9 w-1/2 shrink-0 sm:w-32" />
         </div>
         <Skeleton className="h-9 w-9 sm:w-24 shrink-0" />
       </div>

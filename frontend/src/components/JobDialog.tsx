@@ -131,6 +131,7 @@ function JobDialog({
       error: "Terjadi kesalahan, coba lagi",
     });
   };
+
   if (!type) return null;
 
   return (
@@ -141,19 +142,17 @@ function JobDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
+        {/* ─── DELETE ─── */}
         {type === "delete" && (
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={() => selected?._id && onDelete?.(selected._id)}>
-              Delete
-            </Button>
-          </div>
+          <p className="py-2 text-sm text-muted-foreground">
+            Tindakan ini tidak dapat dibatalkan.
+          </p>
         )}
 
+        {/* ─── FORM (create / edit) ─── */}
         {isFormMode && (
           <form
+            id="job-form"
             onSubmit={handleSubmitForm}
             className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 md:gap-6"
           >
@@ -193,17 +192,10 @@ function JobDialog({
                 )}
               </div>
             ))}
-            <DialogFooter className="col-span-full mt-4 sm:justify-end">
-              <DialogClose asChild>
-                <Button variant="default">Cancel</Button>
-              </DialogClose>
-              <Button type="submit">
-                {type === "create" ? "Save Data" : "Save Changes"}
-              </Button>
-            </DialogFooter>
           </form>
         )}
 
+        {/* ─── VIEW ─── */}
         {type === "view" && (
           <div className="grid grid-cols-1 gap-4 py-4 text-sm md:grid-cols-2 md:gap-6">
             {formFields.map((field) => (
@@ -219,11 +211,36 @@ function JobDialog({
                 </span>
               </div>
             ))}
-            <div className="col-span-full mt-4 flex justify-end">
-              <Button onClick={onClose}>Close</Button>
-            </div>
           </div>
         )}
+
+        {/* ─── FOOTER (konsisten di semua mode) ─── */}
+        <DialogFooter className="mt-4 sm:justify-end">
+          {type === "delete" ? (
+            <>
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => selected?._id && onDelete?.(selected._id)}
+              >
+                Delete
+              </Button>
+            </>
+          ) : type === "view" ? (
+            <Button onClick={onClose}>Close</Button>
+          ) : (
+            <>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" form="job-form">
+                {type === "create" ? "Save Data" : "Save Changes"}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
